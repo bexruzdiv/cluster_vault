@@ -5,5 +5,6 @@
   become_user: root
   
   roles:
+    - nginx_add_vhost
     - vault
     
