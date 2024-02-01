@@ -1,4 +1,18 @@
 ---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install certbot and plugins
+  apt:
+    name: ["certbot", "python3-certbot-nginx"]
+    state: present
+  when: ansible_facts['distribution'] == "Ubuntu"
+
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: present
 - name: delete default nginx site
   file:
     path: /etc/nginx/sites-available/default
@@ -26,3 +40,14 @@
     state: link
   when: item.renew
   loop: "{{ nginx_domains }}"
+
+- include_tasks: create-cert-standalone.yml
+  when: cert_item.renew
+  with_items: "{{ nginx_domains }}"
+  loop_control:
+    loop_var: cert_item
+    
+# - name: Restart nginx
+#   service:
+#     name: nginx
+#     state: restarted
