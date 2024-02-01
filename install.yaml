@@ -5,5 +5,5 @@
   become_user: root
   
   roles:
-    - cluster_vaul_hashi
+    - vault
     

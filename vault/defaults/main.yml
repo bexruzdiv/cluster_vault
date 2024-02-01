@@ -4,13 +4,13 @@ nginx_admin_email: bexruzffakk02@gmail.com
 nginx_certbot_certificate_presence: yes
 nginx_domains:
   
-  - domain: vault123.bexruzdev.uz
+  - domain: vault321.bexruzdev.uz
     port: 8200
-    upstream: vault123.bexruzdev.uz
+    upstream: vault321.bexruzdev.uz
     client_max_body_size: 100M
-    host1: "{{ vault_server_1 }}"
-    host2: "{{ vault_server_2 }}"
-    host3: "{{ vault_server_3 }} "
+    host1: 
+    host2: 
+    host3: 
     
     renew: true
 

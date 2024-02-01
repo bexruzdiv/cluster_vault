@@ -125,7 +125,7 @@
 
 #follower 1
 - name: Run vault operator join raft to self follower1
-  command: vault operator raft join  -address="https://127.0.0.1:8200" "http://{{ vault_server_1 }}:8200"
+  command: vault operator raft join  -address="http://127.0.0.1:8200" "http://{{ vault_server_1 }}:8200"
   when: inventory_hostname == 'follower1'
 
 - name: Self Unseal Vault follower1  
