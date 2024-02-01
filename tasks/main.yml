@@ -1,0 +1,156 @@
+---
+- name: Update apt package cache
+  apt:
+    update_cache: yes
+  when: inventory_hostname == 'loadbalancer'
+
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: present
+  when: inventory_hostname == 'loadbalancer'
+
+- name: Install certbot and plugins
+  apt:
+    name: ["certbot", "python3-certbot-nginx"]
+    state: present
+  when: inventory_hostname == 'loadbalancer'
+
+
+- name: Set Certbot script variable.
+  set_fact:
+    certbot_script: "{{ certbot_package }}"
+  when: inventory_hostname == 'loadbalancer'
+
+
+
+#####################     configuration of nginx for https     ###################################
+- import_tasks: nginx-confs.yml
+  when: inventory_hostname == 'loadbalancer'
+
+
+- include_tasks: create-cert-standalone.yml
+  # when: cert_item.renew
+  with_items: "{{ nginx_domains }}"
+  loop_control:
+    loop_var: cert_item
+  when: cert_item.renew and inventory_hostname == 'loadbalancer'
+
+
+
+#########  Cron job for auto renew certificate
+- import_tasks: renew-cron.yml
+  when: certbot_auto_renew and inventory_hostname == 'loadbalancer'
+
+
+
+############      installation vault for all server    ###############
+- import_tasks: install-vault.yml
+  when: inventory_hostname in ['leader', 'follower1', 'follower2']
+
+
+# configuration of vault 
+- name: Create Vault configuration file
+  template:
+    src: "{{ 'vault.hcl_1' if inventory_hostname == 'leader' else ('vault.hcl_2' if inventory_hostname == 'follower1' else 'vault.hcl_3') }}"
+    dest: /etc/vault.d/vault.hcl
+  when: inventory_hostname in ['leader', 'follower1', 'follower2']
+
+
+- name: Ensure Vault service is started and enabled
+  become: true
+  service:
+    name: vault
+    state: started
+    enabled: true
+  when: inventory_hostname in ['leader', 'follower1', 'follower2']
+
+- name: Run vault operator init leader 
+  command: vault operator init -address=http://127.0.0.1:8200
+  register: vault_init_output
+  when: inventory_hostname == 'leader'
+
+- set_fact:
+    unseal_key_1: "{{ vault_init_output.stdout_lines[0].split(': ')[1] }}"
+    unseal_key_2: "{{ vault_init_output.stdout_lines[1].split(': ')[1] }}"
+    unseal_key_3: "{{ vault_init_output.stdout_lines[2].split(': ')[1] }}"
+    unseal_key_4: "{{ vault_init_output.stdout_lines[3].split(': ')[1] }}"
+    unseal_key_5: "{{ vault_init_output.stdout_lines[4].split(': ')[1] }}"
+    root_token: "{{ vault_init_output.stdout_lines[6].split(': ')[1] }}"
+  when: inventory_hostname == 'leader'
+
+- name: Create /root/key file with unseal keys and root token
+  ansible.builtin.copy:
+    content: |
+      Unseal Key 1: {{ unseal_key_1 }}
+      Unseal Key 2: {{ unseal_key_2 }}
+      Unseal Key 3: {{ unseal_key_3 }}
+      Unseal Key 4: {{ unseal_key_4 }}
+      Unseal Key 5: {{ unseal_key_5 }}
+      Root Token: {{ root_token }}
+    dest: /root/key
+  when: inventory_hostname == 'leader'
+
+- name: Run vault operator join raft follower1 
+  command: vault operator raft join -address="http://{{ vault_server_1 }}:8200" "http://{{ vault_server_1 }}:8200"
+  when: inventory_hostname == 'follower1'
+
+- name: Run vault operator join raft follower2 
+  command: vault operator raft join -address="http://{{ vault_server_1 }}:8200" "http://{{ vault_server_1 }}:8200"
+  when: inventory_hostname == 'follower2'
+
+- name: Use variables from leader host
+  debug:
+    msg: |
+      "Unseal Keys from leader: 
+      - {{ hostvars['leader'].unseal_key_1 }}
+      - {{ hostvars['leader'].unseal_key_2 }}
+      - {{ hostvars['leader'].unseal_key_3 }}
+      - {{ hostvars['leader'].unseal_key_4 }}
+      - {{ hostvars['leader'].unseal_key_5 }}"
+
+
+- name: Unseal Vault
+  ansible.builtin.shell:
+    cmd: vault operator unseal -address="http://{{ vault_server_1 }}:8200" "{{ item }}"
+  loop:
+    - "{{ hostvars['leader'].unseal_key_1 }}"
+    - "{{ hostvars['leader'].unseal_key_2 }}"
+    - "{{ hostvars['leader'].unseal_key_3 }}"
+  loop_control:
+    loop_var: item
+  when: inventory_hostname in ['leader', 'follower1', 'follower2']
+  
+
+
+#follower 1
+- name: Run vault operator join raft to self follower1
+  command: vault operator raft join  -address="https://127.0.0.1:8200" "http://{{ vault_server_1 }}:8200"
+  when: inventory_hostname == 'follower1'
+
+- name: Self Unseal Vault follower1  
+  ansible.builtin.shell:
+    cmd: vault operator unseal -address="http://127.0.0.1:8200" "{{ item }}"
+  loop:
+    - "{{ hostvars['leader'].unseal_key_1 }}"
+    - "{{ hostvars['leader'].unseal_key_2 }}"
+    - "{{ hostvars['leader'].unseal_key_3 }}"
+  loop_control:
+    loop_var: item
+  when: inventory_hostname == 'follower1'
+
+#follower 2
+- name: Run vault operator join raft to self follower2
+  command: vault operator raft join -address="http://127.0.0.1:8200" "http://{{ vault_server_1 }}:8200" 
+  when: inventory_hostname == 'follower2'
+
+- name: Self Unseal Vault follower2
+  ansible.builtin.shell:
+    cmd: vault operator unseal -address="http://127.0.0.1:8200" "{{ item }}"
+  loop:
+    - "{{ hostvars['leader'].unseal_key_1 }}"
+    - "{{ hostvars['leader'].unseal_key_2 }}"
+    - "{{ hostvars['leader'].unseal_key_3 }}"
+  loop_control:
+    loop_var: item
+  when: inventory_hostname == 'follower2'

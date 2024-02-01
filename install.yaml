@@ -1,0 +1,9 @@
+---
+- name: Copy and configure inventory.ini to remote hosts
+  hosts: vault
+  become: true
+  become_user: root
+  
+  roles:
+    - cluster_vaul_hashi
+    

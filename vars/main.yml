@@ -1,0 +1,6 @@
+---
+# vars file for cluster_vaul_hashi
+vault_server_1:
+vault_server_2:
+vault_server_3:
+
