@@ -1,16 +1,16 @@
 ---
 # defaults file for cluster_vaul_hashi
-nginx_admin_email: bexruzffakk02@gmail.com
+nginx_admin_email: "{{ email }}"
 nginx_certbot_certificate_presence: yes
 nginx_domains:
   
-  - domain: vault321.bexruzdev.uz
+  - domain: "{{ domain }}"
     port: 8200
-    upstream: vault321.bexruzdev.uz
+    upstream: "{{ domain }}"
     client_max_body_size: 100M
-    host1: 37.27.43.150
-    host2: 65.108.51.76
-    host3: 65.108.148.117
+    host1: "{{ vault_server_1 }}"
+    host2: "{{ vault_server_2 }}"
+    host3: "{{ vault_server_3 }}"
     
     renew: true
 
