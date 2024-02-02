@@ -1,7 +1,7 @@
 upstream {{ item.upstream }} {
-        server {{ item.host1 }}:{{ item.port }} max_fails=0 fail_timeout=0;
-        server {{ item.host2 }}:{{ item.port }} max_fails=0 fail_timeout=0;
-        server {{ item.host3 }}:{{ item.port }} max_fails=0 fail_timeout=0;
+        server {{ item.host1 }}:{{ item.port }} max_fails=3 fail_timeout=0;
+        server {{ item.host2 }}:{{ item.port }} max_fails=3 fail_timeout=0;
+        server {{ item.host3 }}:{{ item.port }} max_fails=3 fail_timeout=0;
 }
 
 server {

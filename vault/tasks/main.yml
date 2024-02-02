@@ -35,7 +35,7 @@
   when: inventory_hostname == 'leader'
 
 - name: Create /root/key file with unseal keys and root token
-  when: inventory_hostname == 'leader'
+  when: inventory_hostname == 'leader' and save_unseal_file|bool
   ansible.builtin.copy:
     content: |
       Unseal Key 1: {{ unseal_key_1 }}
@@ -76,6 +76,26 @@
   loop_control:
     loop_var: item
   
+- name: Render unseal script
+  when: inventory_hostname in ['leader', 'follower1', 'follower2'] and auto_unseal|bool 
+  template:
+    src: unseal_vault_template.j2
+    dest: /usr/local/bin/unseal_vault.sh
+    mode: '0755'
+  vars:
+    unseal_key_1: "{{ hostvars['leader'].unseal_key_1 }}"
+    unseal_key_2: "{{ hostvars['leader'].unseal_key_2 }}"
+    unseal_key_3: "{{ hostvars['leader'].unseal_key_3 }}"
+
+- name: Ensure vault service file is present
+  when: inventory_hostname in ['leader', 'follower1', 'follower2'] and auto_unseal|bool
+  template:
+    src: vault.service.j2
+    dest: /usr/lib/systemd/system/vault.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload systemd
 
 
 #follower 1

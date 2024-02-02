@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Unseal Vault using provided keys
+vault operator unseal -address="http://127.0.0.1:8200" "{{ unseal_key_1 }}"
+vault operator unseal -address="http://127.0.0.1:8200" "{{ unseal_key_2 }}"
+vault operator unseal -address="http://127.0.0.1:8200" "{{ unseal_key_3 }}"
+

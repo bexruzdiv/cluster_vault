@@ -3,7 +3,8 @@
   hosts: vault
   become: true
   become_user: root
-  
+  vars:
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
   roles:
     - nginx_add_vhost
     - vault
