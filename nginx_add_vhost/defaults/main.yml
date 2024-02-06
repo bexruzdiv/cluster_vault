@@ -4,11 +4,11 @@ nginx_admin_email: bexruzffakk02@gmail.com
 nginx_certbot_certificate_presence: yes
 nginx_domains:
   
-  - domain: vault234.bexruzdev.uz
+  - domain: vaults.bexruzdev.uz
     port: 8200
-    upstream: vault234.bexruzdev.uz
+    upstream: vaults.bexruzdev.uz
     client_max_body_size: 100M
-    host1: 65.108.51.76
+    host1: 65.108.148.117
     host2: 37.27.43.150
-    host3: 65.108.148.117
+    host3: 65.108.219.172
     renew: true
