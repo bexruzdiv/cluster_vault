@@ -1,10 +1,13 @@
 ---
 # vars file for cluster_vaul_hashi
-vault_server_1: 65.108.148.117  # leader ip address
-vault_server_2: 135.181.193.75  # follower 1 ip address
-vault_server_3: 65.108.219.172 # follower 2 ip address
-
-# Warnig!!! Unseal keys can be dangerous to store. This may give others access to the Vault!
+vault_server_1: 65.108.219.172  # * leader ip address
+vault_server_2: 65.108.148.117  # * follower 1 ip address
+vault_server_3: 95.217.18.76  # * follower 2 ip address
+prometheus: true
+# *! Warnig!!! Unseal keys can be dangerous to store. This may give others access to the Vault!
+#* save all unseal key and token in leader server /root/key
 save_unseal_file: true 
+
+#* auto unseal when vault restarted. 
 auto_unseal: true
 

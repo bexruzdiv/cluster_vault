@@ -8,7 +8,7 @@ nginx_domains:
     port: 8200
     upstream: vaults.bexruzdev.uz
     client_max_body_size: 100M
-    host1: 65.108.148.117
-    host2: 37.27.43.150
-    host3: 65.108.219.172
+    host1: 65.108.219.172
+    host2: 65.108.148.117
+    host3: 95.217.18.76
     renew: true
