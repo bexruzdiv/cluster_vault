@@ -1,19 +1,22 @@
 ---
 # * installation vault for all server    
 - import_tasks: install-vault.yml
-  when: inventory_hostname in ['leader', 'follower1', 'follower2']
+  when: 
+    - inventory_hostname in ['leader', 'follower1', 'follower2']
 
 
 # * configuration of vault 
 - name: Create Vault configuration file
-  when: inventory_hostname in ['leader', 'follower1', 'follower2']
+  when: 
+    - inventory_hostname in ['leader', 'follower1', 'follower2']
   template:
     src: "{{ 'vault.hcl_1' if inventory_hostname == 'leader' else ('vault.hcl_2' if inventory_hostname == 'follower1' else 'vault.hcl_3') }}"
     dest: /etc/vault.d/vault.hcl
 
 
 - name: Ensure Vault service is started and enabled
-  when: inventory_hostname in ['leader', 'follower1', 'follower2']
+  when: 
+    - inventory_hostname in ['leader', 'follower1', 'follower2']
   become: true
   service:
     name: vault
@@ -21,74 +24,75 @@
     enabled: true
 
 - name: Run vault operator init leader 
-  when: inventory_hostname == 'leader'
+  when: 
+    - inventory_hostname == 'leader'
   command: vault operator init -address=http://127.0.0.1:8200
-  register: vault_init_output
+  register: __vault_init_output 
 
 - set_fact:
-    unseal_key_1: "{{ vault_init_output.stdout_lines[0].split(': ')[1] }}"
-    unseal_key_2: "{{ vault_init_output.stdout_lines[1].split(': ')[1] }}"
-    unseal_key_3: "{{ vault_init_output.stdout_lines[2].split(': ')[1] }}"
-    unseal_key_4: "{{ vault_init_output.stdout_lines[3].split(': ')[1] }}"
-    unseal_key_5: "{{ vault_init_output.stdout_lines[4].split(': ')[1] }}"
-    root_token: "{{ vault_init_output.stdout_lines[6].split(': ')[1] }}"
-  when: inventory_hostname == 'leader'
+    _vault_unseal_key_1: "{{ __vault_init_output.stdout_lines[0].split(': ')[1] }}"
+    _vault_unseal_key_2: "{{ __vault_init_output.stdout_lines[1].split(': ')[1] }}"
+    _vault_unseal_key_3: "{{ __vault_init_output.stdout_lines[2].split(': ')[1] }}"
+    _vault_unseal_key_4: "{{ __vault_init_output.stdout_lines[3].split(': ')[1] }}"
+    _vault_unseal_key_5: "{{ __vault_init_output.stdout_lines[4].split(': ')[1] }}"
+    _vault_root_token: "{{ __vault_init_output.stdout_lines[6].split(': ')[1] }}"
+  when: 
+    - inventory_hostname == 'leader'
 
 - name: Create /root/key file with unseal keys and root token
-  when: inventory_hostname == 'leader' and save_unseal_file|bool
+  when: 
+    - inventory_hostname == 'leader' 
+    - save_unseal_file|bool
   ansible.builtin.copy:
     content: |
-      Unseal Key 1: {{ unseal_key_1 }}
-      Unseal Key 2: {{ unseal_key_2 }}
-      Unseal Key 3: {{ unseal_key_3 }}
-      Unseal Key 4: {{ unseal_key_4 }}
-      Unseal Key 5: {{ unseal_key_5 }}
-      Root Token: {{ root_token }}
+      Unseal Key 1: {{ vault_unseal_use_1 }}
+      Unseal Key 2: {{ vault_unseal_use_2 }}
+      Unseal Key 3: {{ vault_unseal_use_3 }}
+      Unseal Key 4: {{ vault_unseal_use_4 }}
+      Unseal Key 5: {{ vault_unseal_use_5 }}
+      Root Token: {{ vault_root_token }}
     dest: /root/key
 
 - name: Run vault operator join raft follower1 
-  when: inventory_hostname == 'follower1'
+  when: 
+    - inventory_hostname == 'follower1'
   command: vault operator raft join -address="http://{{ vault_server_1 }}:8200" "http://{{ vault_server_1 }}:8200"
 
 - name: Run vault operator join raft follower2 
-  when: inventory_hostname == 'follower2'
+  when: 
+    - inventory_hostname == 'follower2'
   command: vault operator raft join -address="http://{{ vault_server_1 }}:8200" "http://{{ vault_server_1 }}:8200"
 
-- name: Use variables from leader host
-  debug:
-    msg: |
-      "Unseal Keys from leader: 
-      - {{ hostvars['leader'].unseal_key_1 }}
-      - {{ hostvars['leader'].unseal_key_2 }}
-      - {{ hostvars['leader'].unseal_key_3 }}
-      - {{ hostvars['leader'].unseal_key_4 }}
-      - {{ hostvars['leader'].unseal_key_5 }}"
-
-
 - name: Unseal Vault
-  when: inventory_hostname in ['leader', 'follower1', 'follower2']
+  when:
+    - inventory_hostname in ['leader', 'follower1', 'follower2']
   ansible.builtin.shell:
     cmd: vault operator unseal -address="http://{{ vault_server_1 }}:8200" "{{ item }}"
   loop:
-    - "{{ hostvars['leader'].unseal_key_1 }}"
-    - "{{ hostvars['leader'].unseal_key_2 }}"
-    - "{{ hostvars['leader'].unseal_key_3 }}"
+    - "{{ vault_unseal_use_1 }}"
+    - "{{ vault_unseal_use_2 }}"
+    - "{{ vault_unseal_use_3 }}"
   loop_control:
     loop_var: item
   
 - name: Render unseal script
-  when: inventory_hostname in ['leader', 'follower1', 'follower2'] and auto_unseal|bool 
+  when:
+    - inventory_hostname in ['leader', 'follower1', 'follower2']
+    - auto_unseal|bool
   template:
     src: unseal_vault_template.j2
     dest: /usr/local/bin/unseal_vault.sh
     mode: '0755'
   vars:
-    unseal_key_1: "{{ hostvars['leader'].unseal_key_1 }}"
-    unseal_key_2: "{{ hostvars['leader'].unseal_key_2 }}"
-    unseal_key_3: "{{ hostvars['leader'].unseal_key_3 }}"
+    unseal_1: "{{ vault_unseal_use_1 }}"
+    unseal_2: "{{ vault_unseal_use_2 }}"
+    unseal_3: "{{ vault_unseal_use_3 }}"
 
 - name: Ensure vault service file is present
-  when: inventory_hostname in ['leader', 'follower1', 'follower2'] and auto_unseal|bool
+  when:
+    - inventory_hostname in ['leader', 'follower1', 'follower2']
+    - auto_unseal|bool
+
   template:
     src: vault.service.j2
     dest: /usr/lib/systemd/system/vault.service
@@ -100,33 +104,37 @@
 
 # *follower 1
 - name: Run vault operator join raft to self follower1
-  when: inventory_hostname == 'follower1'
+  when:
+    - inventory_hostname == 'follower1'
   command: vault operator raft join  -address="http://127.0.0.1:8200" "http://{{ vault_server_1 }}:8200"
 
 - name: Self Unseal Vault follower1  
-  when: inventory_hostname == 'follower1'
+  when:
+    - inventory_hostname == 'follower1'
   ansible.builtin.shell:
     cmd: vault operator unseal -address="http://127.0.0.1:8200" "{{ item }}"
   loop:
-    - "{{ hostvars['leader'].unseal_key_1 }}"
-    - "{{ hostvars['leader'].unseal_key_2 }}"
-    - "{{ hostvars['leader'].unseal_key_3 }}"
+    - "{{ vault_unseal_use_1 }}"
+    - "{{ vault_unseal_use_2 }}"
+    - "{{ vault_unseal_use_3 }}"
   loop_control:
     loop_var: item
 
 # *follower 2
 - name: Run vault operator join raft to self follower2
-  when: inventory_hostname == 'follower2'
+  when:
+    - inventory_hostname == 'follower2'
   command: vault operator raft join -address="http://127.0.0.1:8200" "http://{{ vault_server_1 }}:8200" 
 
 - name: Self Unseal Vault follower2
-  when: inventory_hostname == 'follower2'
+  when:
+    - inventory_hostname == 'follower2'
   ansible.builtin.shell:
     cmd: vault operator unseal -address="http://127.0.0.1:8200" "{{ item }}"
   loop:
-    - "{{ hostvars['leader'].unseal_key_1 }}"
-    - "{{ hostvars['leader'].unseal_key_2 }}"
-    - "{{ hostvars['leader'].unseal_key_3 }}"
+    - "{{ vault_unseal_use_1 }}"
+    - "{{ vault_unseal_use_2 }}"
+    - "{{ vault_unseal_use_3 }}"
   loop_control:
     loop_var: item
 
@@ -134,7 +142,10 @@
 # *! MONITORING with PROMETHEUS
 
 - name: Copy Prometheus Token to Target
-  when: inventory_hostname == 'leader' and prometheus|bool
+  when:
+    - inventory_hostname == 'leader'
+    - prometheus|bool
+
   template:
   
     src: token-creator.j2
@@ -145,30 +156,39 @@
 
 
 - name: Write prometheus-metrics policy using the vault CLI
+  when:
+    - inventory_hostname == 'leader'
+    - prometheus|bool
   ansible.builtin.command:
     cmd: vault policy write prometheus-metrics /root/token-creator
     executable: /bin/bash
   environment:
-    VAULT_TOKEN: "{{ root_token }}"
+    VAULT_TOKEN: "{{ vault_root_token }}"
     VAULT_ADDR: "http://127.0.0.1:8200"
-  when: inventory_hostname == 'leader' and prometheus|bool
+
 
 
 - name: Create a Vault token for Prometheus metrics and write to a file
-  when: inventory_hostname == 'leader' and prometheus|bool
+  when:
+    - inventory_hostname == 'leader'
+    - prometheus|bool
   ansible.builtin.shell:
-    cmd: vault token create -field=token -policy=prometheus-metrics -address="http://127.0.0.1:8200" > /tmp/prometheus-token
+    cmd: vault token create -field=token -policy=prometheus-metrics > /tmp/prometheus-token
   environment:
-    VAULT_TOKEN: "{{ root_token }}"
+    VAULT_TOKEN: "{{ vault_root_token }}"
     VAULT_ADDR: "http://127.0.0.1:8200"
 
 
 
 - import_tasks: install-prometheus.yml
-  when: inventory_hostname == 'leader' and prometheus|bool
+  when:
+    - inventory_hostname == 'leader'
+    - prometheus|bool
 
 - name: Copy Prometheus configuration to /etc/prometheus/prometheus.yml
-  when: inventory_hostname == 'leader' and prometheus|bool
+  when:
+    - inventory_hostname == 'leader'
+    - prometheus|bool
   template:
     src: prometheus.yml.j2
     dest: /etc/prometheus/prometheus.yml

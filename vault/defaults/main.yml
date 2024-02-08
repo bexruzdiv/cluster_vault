@@ -1,0 +1,6 @@
+vault_unseal_use_1: "{{ hostvars['leader']._vault_unseal_key_1 }}"
+vault_unseal_use_2: "{{ hostvars['leader']._vault_unseal_key_2 }}"
+vault_unseal_use_3: "{{ hostvars['leader']._vault_unseal_key_3 }}"
+vault_unseal_use_4: "{{ hostvars['leader']._vault_unseal_key_4 }}"
+vault_unseal_use_5: "{{ hostvars['leader']._vault_unseal_key_5 }}"
+vault_root_token: "{{ hostvars['leader']._vault_root_token }}" 
