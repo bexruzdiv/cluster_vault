@@ -6,10 +6,10 @@ prometheus: true
 
 # *! Warnig!!! Unseal keys can be dangerous to store. This may give others access to the Vault!
 #* save all unseal key and token in leader server /root/key
-save_unseal_file: true 
+vault_save_unseal_file: true 
 
 #* auto unseal when vault restarted. 
-auto_unseal: true
+vault_auto_unseal: true
 
 
 vault_unseal_use_1: "{{ hostvars['leader']._vault_unseal_key_1 }}"
