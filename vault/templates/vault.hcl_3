@@ -16,6 +16,6 @@ listener "tcp" {
 {% if prometheus|bool %}
 telemetry {
   disable_hostname = true
-  prometheus_retention_time = "30s"
+  prometheus_retention_time = "15s"
 }
 {% endif %}

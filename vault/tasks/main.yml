@@ -1,18 +1,14 @@
 ---
-# * installation vault for all server    
 - import_tasks: install-vault.yml
   when: 
     - inventory_hostname in ['leader', 'follower1', 'follower2']
 
-
-# * configuration of vault 
 - name: Create Vault configuration file
   when: 
     - inventory_hostname in ['leader', 'follower1', 'follower2']
   template:
     src: "{{ 'vault.hcl_1' if inventory_hostname == 'leader' else ('vault.hcl_2' if inventory_hostname == 'follower1' else 'vault.hcl_3') }}"
     dest: /etc/vault.d/vault.hcl
-
 
 - name: Ensure Vault service is started and enabled
   when: 
@@ -92,7 +88,6 @@
   when:
     - inventory_hostname in ['leader', 'follower1', 'follower2']
     - auto_unseal|bool
-
   template:
     src: vault.service.j2
     dest: /usr/lib/systemd/system/vault.service
@@ -101,8 +96,6 @@
     mode: '0644'
   notify: Reload systemd
 
-
-# *follower 1
 - name: Run vault operator join raft to self follower1
   when:
     - inventory_hostname == 'follower1'
@@ -120,7 +113,6 @@
   loop_control:
     loop_var: item
 
-# *follower 2
 - name: Run vault operator join raft to self follower2
   when:
     - inventory_hostname == 'follower2'
@@ -137,62 +129,3 @@
     - "{{ vault_unseal_use_3 }}"
   loop_control:
     loop_var: item
-
-
-# *! MONITORING with PROMETHEUS
-
-- name: Copy Prometheus Token to Target
-  when:
-    - inventory_hostname == 'leader'
-    - prometheus|bool
-
-  template:
-  
-    src: token-creator.j2
-    dest: /root/token-creator
-    owner: root
-    group: root
-    mode: '0644'
-
-
-- name: Write prometheus-metrics policy using the vault CLI
-  when:
-    - inventory_hostname == 'leader'
-    - prometheus|bool
-  ansible.builtin.command:
-    cmd: vault policy write prometheus-metrics /root/token-creator
-    executable: /bin/bash
-  environment:
-    VAULT_TOKEN: "{{ vault_root_token }}"
-    VAULT_ADDR: "http://127.0.0.1:8200"
-
-
-
-- name: Create a Vault token for Prometheus metrics and write to a file
-  when:
-    - inventory_hostname == 'leader'
-    - prometheus|bool
-  ansible.builtin.shell:
-    cmd: vault token create -field=token -policy=prometheus-metrics > /tmp/prometheus-token
-  environment:
-    VAULT_TOKEN: "{{ vault_root_token }}"
-    VAULT_ADDR: "http://127.0.0.1:8200"
-
-
-
-- import_tasks: install-prometheus.yml
-  when:
-    - inventory_hostname == 'leader'
-    - prometheus|bool
-
-- name: Copy Prometheus configuration to /etc/prometheus/prometheus.yml
-  when:
-    - inventory_hostname == 'leader'
-    - prometheus|bool
-  template:
-    src: prometheus.yml.j2
-    dest: /etc/prometheus/prometheus.yml
-    owner: prometheus
-    group: prometheus
-    mode: '0644'
-  notify: reload systemd prom 
