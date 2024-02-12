@@ -1,11 +1,12 @@
 ---
 - name: Copy and configure inventory.ini to remote hosts
-  hosts: vault
+  hosts: localhost
   become: true
   become_user: root
   vars:
     ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
   roles:
-    - nginx_add_vhost
-    - vault
+    -  vault_secret_operator
+    # - nginx_add_vhost
+    # - vault
     
