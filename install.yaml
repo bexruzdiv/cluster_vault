@@ -6,7 +6,7 @@
   vars:
     ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
   roles:
-    -  vault_secret_operator
-    # - nginx_add_vhost
-    # - vault
+    - nginx_add_vhost
+    - vault
+
     
