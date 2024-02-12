@@ -1,8 +1,8 @@
 ---
 # defaults file for vault_secret_operator\
-vso_create_directory: false
-vso_secret_name: "kv"
-vso_secret_collection: "item"
-vso_vault_address: "http://65.108.148.117:8200"
-vso_vault_token: "hvs.nhqj6CVSAnc32vQjwYyv7U1H"
+vso_create_directory: true
+vso_secret_name: ""
+vso_secret_collection: ""
+vso_vault_address: "http://example.com"
+vso_vault_token: ""
 
