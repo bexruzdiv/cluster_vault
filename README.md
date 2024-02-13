@@ -15,6 +15,34 @@ Vault operates by using tokens, which are linked to client policies. These polic
 2. Vault offers secure secret storage by allowing the storage of arbitrary key/value secrets. Before writing these secrets to persistent storage, Vault encrypts them. This means that even if someone gains access to the raw storage, they won't be able to access your secrets without the proper authorization.
 3. Leasing and Renewal: All secrets in Vault have a lease associated with them. At the end of the lease, Vault will automatically revoke that secret. Clients are able to renew leases via built-in renew APIs.
 
+
+## What is Vault Secret Operator (VSO)
+
+
+The Vault Secret Operator (VSO) is a tool that facilitates the integration between HashiCorp Vault and Kubernetes, enabling seamless management of secrets within Kubernetes environments using Vault as the backend storage. Here's how it works and what it offers:
+### Overview:
+
+- **Integration with Kubernetes**: VSO allows Kubernetes applications to securely access secrets stored in Vault without directly interacting with Vault's APIs. This integration simplifies secret management within Kubernetes environments.
+
+- **Dynamic Secret Injection**: VSO automatically injects secrets into Kubernetes pods at runtime, ensuring that applications have access to the secrets they need without developers having to manage secrets manually.
+
+- **Policy-based Access Control**: VSO leverages Vault's policy-based access control mechanism to enforce fine-grained access controls on secrets. This ensures that only authorized entities can access specific secrets within Vault.
+
+- **Automated Lifecycle Management**: VSO automates the lifecycle management of secrets, including creation, rotation, and revocation, based on defined policies and configurations.
+
+### How it Works:
+
+1. **Configuration**: Administrators configure VSO to establish the connection between Vault and Kubernetes. This involves setting up authentication mechanisms, defining policies, and configuring secret injection settings.
+
+2. **Authentication**: VSO authenticates with Vault using a service account or other authentication mechanisms supported by Vault. This allows VSO to access and manage secrets stored in Vault on behalf of Kubernetes applications.
+
+3. **Secret Injection**: When a Kubernetes pod starts, VSO intercepts requests for secrets and retrieves them from Vault. It then injects the secrets into the pod's environment variables or file system, making them accessible to the application running inside the pod.
+
+4. **Access Control**: VSO enforces Vault's access control policies to ensure that only authorized pods and applications can access specific secrets within Vault. This helps prevent unauthorized access to sensitive information.
+
+5. **Lifecycle Management**: VSO automates the lifecycle management of secrets by periodically rotating them based on predefined policies. It also handles the revocation of secrets when they are no longer needed or compromised.
+
+
 ## Why Raft storage as backend?
 1. __Reduced Configuration:__ With Raft backend, there's no need to configure Vault to connect to external providers as a client, which eliminates additional setup steps and potential points of failure.
 2. __Enhanced Security:__ Since Raft is an integral part of Vault, it allows for tighter integration and control over security measures. This can lead to improved security posture as there are fewer external dependencies and potential attack vectors.
@@ -111,5 +139,14 @@ Change variables in the defaults/main.yml
   -  Specify the address of your Vault cluster
   -  Edit Path for save backups
   -   If the value of `backup_cronjob` is `true`. A cronjob is set to take a backup every night at 00:00
+
+## Vault Secret Operator role
+> [!NOTE]
+> This Ansible role automates the setup and configuration of a Vault Secret Operator, facilitating seamless integration between Vault and Kubernetes for managing secrets.
+
+__This Ansible role performs the following tasks:__
+  - Creating `ServiceAccount, Secret, ClusterRoleBinding` for vault
+  - Create vault policy for read collection data
+  - Creates a secret in k8s from the data in the vault collection in the specified path and updates it continuously
 
 
