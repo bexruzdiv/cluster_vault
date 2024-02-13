@@ -94,3 +94,5 @@ __This Ansible role performs the following tasks:__
 loadbalancer
 ```
 These names must be used in hostnames. This is used during the task!
+> [!TIP]
+> You can run Vault and nginx loadbalancer roles at the same time!
