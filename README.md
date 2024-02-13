@@ -150,4 +150,14 @@ __This Ansible role performs the following tasks:__
   - Creates a secret in k8s from the data in the vault collection in the specified path and updates it continuously
   - [MORE](https://github.com/bexruzdiv/cluster_vault#what-is-vault-secret-operator-vso)
 
+### Required of you!
+Change variables in the defaults/main.yml
 
+![image](https://github.com/bexruzdiv/cluster_vault/assets/107495220/e9d9e59e-a9cd-4f6e-b24e-c869e8749ab4)
+
+  -  Change the value of `vso_create_directory` to `true` if you don't already have a defined secret and collection!
+  -  If you already have secret, collection and data Change the value of `vso_create_directory` to `false` and write path
+  -  Write your secret name to `vso_secret_name`
+  -  Write your collection name to `vso_secret_collection`
+  -  Change to  your`s  domain or ip address of `vso_vault_address`
+  -  Set to your vault token `vso_vault_token`
