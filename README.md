@@ -1,4 +1,4 @@
-# What is Vault?    
+## What is Vault?    
 __Vault__, developed by __HashiCorp__, functions as an identity-centric platform for managing secrets and encryption. It provides encryption services that are gated by authentication and authorization methods to ensure secure, auditable and restricted access to secrets. It is used to secure, store and protect secrets and other sensitive data using a __UI__, __CLI__, or __HTTP API__. A secret is anything important that you want to keep safe, like passwords, keys, or certificates. Vault makes it easy to manage all these secrets securely, controlling who can access them and keeping track of who does.
 
 ## How it does work?
@@ -19,3 +19,11 @@ Vault operates by using tokens, which are linked to client policies. These polic
 1. __Reduced Configuration:__ With Raft backend, there's no need to configure Vault to connect to external providers as a client, which eliminates additional setup steps and potential points of failure.
 2. __Enhanced Security:__ Since Raft is an integral part of Vault, it allows for tighter integration and control over security measures. This can lead to improved security posture as there are fewer external dependencies and potential attack vectors.
 3. __Performance:__ Raft backend can offer improved performance compared to external storage systems, as it operates within the same infrastructure as Vault itself, reducing latency and overhead associated with external network communication.
+
+## Why multiNode Vault Cluster?
+1. __High Availability:__ With multiple nodes, Vault can continue to operate even if one or more nodes fail. This ensures that critical services relying on Vault can continue running without interruption.
+2. __Scalability:__ As the demand for secrets management grows, a multi-node cluster allows for horizontal scaling by adding more nodes to distribute the workload and handle increased traffic.
+3. __Fault Tolerance:__ Multi-node clusters provide fault tolerance by replicating data across nodes. In case of node failure, data can be seamlessly retrieved from other nodes, preventing data loss or service disruptions.
+4. __Load Balancing:__ A cluster enables load balancing of client requests across multiple nodes, improving performance and resource utilization, reducing the risk of single points of failure and enhancing overall system reliability.
+
+
