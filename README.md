@@ -1,5 +1,5 @@
 ## What is Vault?    
-__Vault__, developed by __HashiCorp__, functions as an identity-centric platform for managing secrets and encryption. It provides encryption services that are gated by authentication and authorization methods to ensure secure, auditable and restricted access to secrets. It is used to secure, store and protect secrets and other sensitive data using a __UI__, __CLI__, or __HTTP API__. A secret is anything important that you want to keep safe, like passwords, keys, or certificates. Vault makes it easy to manage all these secrets securely, controlling who can access them and keeping track of who does.
+__Vault__, developed by __HashiCorp__, functions as an identity-centric platform for managing secrets and encryption. It provides encryption services that are gated by authentication and authorization methods to ensure secure, auditable and restricted access to secrets. It is used to secure, store and protect secrets and other sensitive data using a __UI__, __CLI__, or __HTTP API__. A secret is anything important that you want to keep safe, like passwords, keys, or certificates. Vault makes it easy to manage all these secrets securely, controlling who can access them and keeping track of who does. [MORE](https://developer.hashicorp.com/vault/docs/what-is-vault)
 
 ## How it does work?
 Vault operates by using tokens, which are linked to client policies. These policies determine what actions and paths a client can access. Tokens can be manually created and assigned to clients, or clients can obtain them by logging in. The main steps in Vault's workflow are:
@@ -28,15 +28,15 @@ Vault operates by using tokens, which are linked to client policies. These polic
 
 ## How to use ansible roles?
 __You just need to change the variables in the defaults/main.yml file inside the roles to use these ansible roles!__
-### Vault role
+## Vault role
 __This Ansible role performs the following tasks:__
 1. Installs Vault on all servers.
 2. Configures Vault according to specified settings.
 3. Starts Vault using systemd.
-4. Establishes a cluster with three nodes.
+4. Establishes a cluster with three nodes (the roles are adapted to a cluster of 3 nodes)
 5. Enables interconnection of Raft storage among the nodes.
 
-## Required of you! Change variables in the defaults/main.yml
+### Required of you! Change variables in the defaults/main.yml
 Change IP address with your`s
 ```
 vault_server_1:   # * leader ip address
@@ -49,3 +49,48 @@ This allows you cluster metrics to `/v1/sys/metrics` path. You can use it with `
 prometheus: true
 ```
 
+
+
+Save all unseal key and token in leader server `/root/key`. You can use it with `true`
+```
+vault_save_unseal_file: true
+```
+
+Auto unseal when vault restarted. You can customize this by changing the value to `true`. By doing this, a bash scritp is generated and stored in `/usr/local/bin/unseal_vault.sh` This will automatically unseal the vault in systemd when it restarts  Warnig!!! Unseal keys can be dangerous to store. This may give others access to the Vault! 
+
+> [!WARNING]
+> Unseal keys can be dangerous to store. This may give others access to the Vault! 
+
+```
+vault_auto_unseal: true
+```
+#### Correct use of the inventory file is also very important!
+```
+leader
+follower1
+follower2
+```
+These names must be used in hostnames. This is used during the task!
+
+## Nginx LoadBalancer role
+__This Ansible role performs the following tasks:__
+1. Install Certbot and Nginx
+2. Configuration Nginx for Vault Cluster LoadBalancer
+3. Gets a certificate for secury!
+
+### Required of you!
+1. Match your domain name to loadbalancer's IP
+2. Change variables in the defaults/main.yml
+
+![image](https://github.com/bexruzdiv/cluster_vault/assets/107495220/ee1b2885-21f3-4942-a79d-ee2913b6b85f)
+
+  - Change gmail to your`s
+  - Use Domain which you set for loadbalancer server`s IP
+  - Write down the IP addresses of the vault cluster servers (the roles are adapted to a cluster of 3 nodes)
+
+
+#### Correct use of the inventory file is also very important!
+```
+loadbalancer
+```
+These names must be used in hostnames. This is used during the task!
