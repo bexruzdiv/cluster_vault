@@ -148,5 +148,6 @@ __This Ansible role performs the following tasks:__
   - Creating `ServiceAccount, Secret, ClusterRoleBinding` for vault
   - Create vault policy for read collection data
   - Creates a secret in k8s from the data in the vault collection in the specified path and updates it continuously
+  - [MORE](https://github.com/bexruzdiv/cluster_vault#what-is-vault-secret-operator-vso)
 
 
