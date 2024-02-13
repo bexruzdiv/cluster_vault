@@ -98,5 +98,18 @@ These names must be used in hostnames. This is used during the task!
 > You can run Vault and nginx loadbalancer roles at the same time!
 
 ## Vault Backup role
+__This Ansible role performs the following tasks:__
+1.  Install vault CLI
+2.  Backup at any time (through the rack operator)
+3.  Set Cronjob for backup
+
+### Required of you!
+Change variables in the defaults/main.yml
+
+![image](https://github.com/bexruzdiv/cluster_vault/assets/107495220/82dfaadc-9019-4f30-a35b-019378571186)
+  -  Create and specify a token from Vault for backup 
+  -  Specify the address of your Vault cluster
+  -  Edit Path for save backups
+  -   If the value of `backup_cronjob` is `true`. A cronjob is set to take a backup every night at 00:00
 
 
