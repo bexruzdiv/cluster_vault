@@ -44,7 +44,7 @@ vault_server_2:   # * follower 1 ip address
 vault_server_3:   # * follower 2 ip address
 ```
 
-This allows you cluster metrics to `/v1/sys/metrics` path. You can use it with `true`
+This allows you cluster metrics to `/v1/sys/metrics` path. You can use it with `true`. It allows you to build a monitor (via Prometheus and Grafana)
 ```
 prometheus: true
 ```
@@ -96,3 +96,7 @@ loadbalancer
 These names must be used in hostnames. This is used during the task!
 > [!TIP]
 > You can run Vault and nginx loadbalancer roles at the same time!
+
+## Vault Backup role
+
+
