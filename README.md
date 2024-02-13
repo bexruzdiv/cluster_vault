@@ -161,3 +161,15 @@ Change variables in the defaults/main.yml
   -  Write your collection name to `vso_secret_collection`
   -  Change to  your`s  domain or ip address of `vso_vault_address`
   -  Set to your vault token `vso_vault_token`
+
+
+
+
+# 🚀 Your Feedback Matters!
+Your thoughts, suggestions, and questions are invaluable to us! If you have any inquiries, ideas, or requests regarding your GitHub repository or project, please don't hesitate to reach out.
+
+📧 Email: bexruzturobjonov0955@gmail.com
+
+💬 Telegram: https://t.me/blvck_sudo
+
+We would be delighted to collaborate with you in enhancing your project together!
