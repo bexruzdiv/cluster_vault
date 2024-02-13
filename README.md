@@ -26,4 +26,26 @@ Vault operates by using tokens, which are linked to client policies. These polic
 3. __Fault Tolerance:__ Multi-node clusters provide fault tolerance by replicating data across nodes. In case of node failure, data can be seamlessly retrieved from other nodes, preventing data loss or service disruptions.
 4. __Load Balancing:__ A cluster enables load balancing of client requests across multiple nodes, improving performance and resource utilization, reducing the risk of single points of failure and enhancing overall system reliability.
 
+## How to use ansible roles?
+__You just need to change the variables in the defaults/main.yml file inside the roles to use these ansible roles!__
+### Vault role
+__This Ansible role performs the following tasks:__
+1. Installs Vault on all servers.
+2. Configures Vault according to specified settings.
+3. Starts Vault using systemd.
+4. Establishes a cluster with three nodes.
+5. Enables interconnection of Raft storage among the nodes.
+
+## Required of you! Change variables in the defaults/main.yml
+Change IP address with your`s
+```
+vault_server_1:   # * leader ip address
+vault_server_2:   # * follower 1 ip address
+vault_server_3:   # * follower 2 ip address
+```
+
+This allows you cluster metrics to `/v1/sys/metrics` path. You can use it with `true`
+```
+prometheus: true
+```
 
