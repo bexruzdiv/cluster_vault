@@ -3,8 +3,9 @@
 #! if you have created secret and collection change to false and show path
 vso_create_directory: true
 
-vso_secret_name: "your_secret_name"
-vso_secret_collection: "yout_collection_name"
-vso_vault_address: "http://example.com" #your vault cluster address
-vso_vault_token: ""
+vso_secret_name: "year"
+vso_secret_collection: "milllll"
+
+vso_vault_address: "http://65.108.148.117:8200" #your vault cluster address
+vso_vault_token: "hvs.WLIlRAvbBkyopXLEhBOIEZFH"
 

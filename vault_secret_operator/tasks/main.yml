@@ -8,12 +8,13 @@
   environment:
     VAULT_ADDR: "{{ vso_vault_address }}"
     VAULT_TOKEN: "{{ vso_vault_token }}"
+  ignore_errors: true
 
 - name: Put data to secret
   when:
     - vso_create_directory|bool
   ansible.builtin.shell:
-    cmd: vault kv put {{ vso_secret_name }}/{{ vso_secret_collection }} secret={{ vso_secret_name }}
+    cmd: vault kv put {{ vso_secret_name }}/{{ vso_secret_collection }} collection={{ vso_secret_collection }}
   environment:
     VAULT_ADDR: "{{ vso_vault_address }}"
     VAULT_TOKEN: "{{ vso_vault_token }}"
@@ -23,7 +24,7 @@
     src: policy.tpl.j2
     dest: /root/{{ vso_secret_collection }}-policy.tpl
 
-- name: create a policy {{ policy_name }}
+- name: create a policy 
   ansible.builtin.shell:
     cmd: vault policy write {{ vso_secret_collection }}-policy /root/{{ vso_secret_collection }}-policy.tpl
   environment:
