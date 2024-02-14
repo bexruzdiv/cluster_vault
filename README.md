@@ -163,9 +163,42 @@ Change variables in the defaults/main.yml
   -  Set to your vault token `vso_vault_token`
 
 # How to monitor Vault Cluster🖥〽️
+> [!NOTE]
+> Since this process is not automated, you have to do it manually
+1.  export your vault address and token with `export VAULT_ADDR=https://your_vault_Address` and `export VAULT_TOKEN="your vault token"`
+2.  Create vault policy 
+```
+vault policy write prometheus-metrics - << EOF
+path "/sys/metrics" {
+  capabilities = ["read"]
+}
+EOF
+```
+3.  Create token with policy
+```
+vault token create \
+  -field=token \
+  -policy prometheus-metrics \
+  > /root/prometheus-token
+```
+You can use another path for save token!
+4. Install prometheus if does not exists
+5. Create job in sudo  `/etc/prometheus/prometheus.yml`
+```
+  - job_name: vault
+    metrics_path: /v1/sys/metrics
+    params:
+      format: ['prometheus']
+    scheme: http
+    authorization:
+      credentials_file: /root/prometheus-token #change path  with your token location 
+    static_configs:
+    - targets: ['leader_ip:8200', 'follower1_ip:8200', 'follower2_ip:8200'] # change ips with your vault servers
 
-
-
+```
+> [!WARNING]
+> Don't use Domain name of LoadBalancer! Change path to token and ips of vault servers
+> 
 # 🚀 Your Feedback Matters!
 Your thoughts, suggestions, and questions are invaluable to us! If you have any inquiries, ideas, or requests regarding your GitHub repository or project, please don't hesitate to reach out.
 
