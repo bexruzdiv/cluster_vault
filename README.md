@@ -216,7 +216,7 @@ You must have 3 nodes UP in your target!
 
 12. Result
 
-![image](https://github.com/bexruzdiv/cluster_vault/assets/107495220/84be3dc6-ca13-44d7-ba76-9b3596746811)
+![image_2024-02-14_11-32-51](https://github.com/bexruzdiv/cluster_vault/assets/107495220/1fd98056-68b9-456a-b037-41dc405a089a)
 
 
 # 🚀 Your Feedback Matters!
