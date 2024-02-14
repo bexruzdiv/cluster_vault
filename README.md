@@ -219,9 +219,6 @@ You must have 3 nodes UP in your target!
 ![image](https://github.com/bexruzdiv/cluster_vault/assets/107495220/84be3dc6-ca13-44d7-ba76-9b3596746811)
 
 
-
-
-
 # 🚀 Your Feedback Matters!
 Your thoughts, suggestions, and questions are invaluable to us! If you have any inquiries, ideas, or requests regarding your GitHub repository or project, please don't hesitate to reach out.
 
