@@ -165,6 +165,7 @@ Change variables in the defaults/main.yml
 # How to monitor Vault Cluster🖥〽️
 > [!NOTE]
 > Since this process is not automated, you have to do it manually
+> And you have to set value of `prometheus: true` in Vault role! 
 1.  export your vault address and token with `export VAULT_ADDR=https://your_vault_Address` and `export VAULT_TOKEN="your vault token"`
 2.  Create vault policy 
 ```
@@ -179,9 +180,8 @@ EOF
 vault token create \
   -field=token \
   -policy prometheus-metrics \
-  > /root/prometheus-token
+  > /tmp/prometheus-token
 ```
-You can use another path for save token!
 4. Install prometheus if does not exists
 5. Create job in sudo  `/etc/prometheus/prometheus.yml`
 ```
@@ -191,14 +191,37 @@ You can use another path for save token!
       format: ['prometheus']
     scheme: http
     authorization:
-      credentials_file: /root/prometheus-token #change path  with your token location 
+      credentials_file: /tmp/prometheus-token
     static_configs:
     - targets: ['leader_ip:8200', 'follower1_ip:8200', 'follower2_ip:8200'] # change ips with your vault servers
 
 ```
 > [!WARNING]
-> Don't use Domain name of LoadBalancer! Change path to token and ips of vault servers
-> 
+> Don't use Domain name of LoadBalancer! Change ips of vault servers
+
+6. Restart Prometheus. `systemctl restart prometheus`
+   
+![image_2024-02-14_11-22-02](https://github.com/bexruzdiv/cluster_vault/assets/107495220/329491c6-2c76-41d1-80d5-dbd983ee8a2f)
+
+You must have 3 nodes UP in your target!
+
+7. Install grafana if does not exists
+8. Select `connections` and find `prometheus`
+9. Write the ip address where prometheus is located and specify port 9090
+
+![image](https://github.com/bexruzdiv/cluster_vault/assets/107495220/44f26e8a-4be3-474d-bdbe-5da1e62b2214)
+
+10. Select `build dashboard` and then select `import dashboard`
+11. Enter ID `12904` and select `Load`
+
+12. Result
+
+![image](https://github.com/bexruzdiv/cluster_vault/assets/107495220/84be3dc6-ca13-44d7-ba76-9b3596746811)
+
+
+
+
+
 # 🚀 Your Feedback Matters!
 Your thoughts, suggestions, and questions are invaluable to us! If you have any inquiries, ideas, or requests regarding your GitHub repository or project, please don't hesitate to reach out.
 
