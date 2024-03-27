@@ -15,8 +15,12 @@ Vault operates by using tokens, which are linked to client policies. These polic
 2. Vault offers secure secret storage by allowing the storage of arbitrary key/value secrets. Before writing these secrets to persistent storage, Vault encrypts them. This means that even if someone gains access to the raw storage, they won't be able to access your secrets without the proper authorization.
 3. Leasing and Renewal: All secrets in Vault have a lease associated with them. At the end of the lease, Vault will automatically revoke that secret. Clients are able to renew leases via built-in renew APIs.
 
+## What is Bank-Vaults Secret Operator
+The Bank-Vaults Secret Operator is a Kubernetes operator that automates the lifecycle management of Vault instances running within Kubernetes clusters. It leverages Kubernetes custom resources to define and manage Vault configurations, such as authentication methods, policies, and secret engines. In some scenarios, organizations may choose to deploy Vault outside of Kubernetes clusters, either for centralized management or due to existing infrastructure constraints. An external Vault cluster refers to a Vault deployment that runs independently of Kubernetes, typically managed on virtual machines, cloud instances, or on-premises servers.
 
-## What is Vault Secret Operator (VSO)
+### How it works:
+Bank-Vaults Secret Injection Webhook is a specialized tool designed to facilitate secure secret management for individual applications running within a Kubernetes cluster. By seamlessly integrating with HashiCorp Vault, this webhook enables the retrieval of secrets and their injection as environment variables specifically tailored to the needs of the target application.In summary, Bank-Vaults Secret Injection Webhook provides a tailored and secure solution for fetching secrets from Vault and injecting them as environment variables into individual applications running within a Kubernetes environment. By leveraging this webhook, organizations can effectively manage secrets, enhance application security, and maintain operational integrity within their Kubernetes deployments.
+<!-- ## What is Vault Secret Operator (VSO)
 
 
 The Vault Secret Operator (VSO) is a tool that facilitates the integration between HashiCorp Vault and Kubernetes, enabling seamless management of secrets within Kubernetes environments using Vault as the backend storage. Here's how it works and what it offers:
@@ -41,7 +45,7 @@ The Vault Secret Operator (VSO) is a tool that facilitates the integration betwe
 4. **Access Control**: VSO enforces Vault's access control policies to ensure that only authorized pods and applications can access specific secrets within Vault. This helps prevent unauthorized access to sensitive information.
 
 5. **Lifecycle Management**: VSO automates the lifecycle management of secrets by periodically rotating them based on predefined policies. It also handles the revocation of secrets when they are no longer needed or compromised.
-
+-->
 
 ## Why Raft storage as backend?
 1. __Reduced Configuration:__ With Raft backend, there's no need to configure Vault to connect to external providers as a client, which eliminates additional setup steps and potential points of failure.
